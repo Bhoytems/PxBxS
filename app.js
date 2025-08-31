@@ -1,4 +1,4 @@
-const API_KEY = "E8VRPQ2PC6C9NE55";  // put your real API key here
+const API_KEY = "LX98E4376J8RG23B";  // put your real API key here
 const symbols = ["AAPL", "AXP"];
 
 async function fetchStock(symbol) {
