@@ -1,298 +1,36 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
-  <meta charset="UTF-8" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <title>Pocket Signal — AXP & AAPL (Live)</title>
-
-  <style>
-
-    :root{
-
-      --bg:#0b0c10;
-
-      --panel:#11141a;
-
-      --ink:#e8edf3;
-
-      --muted:#9aa3ad;
-
-      --ok:#00c853;
-
-      --bad:#ff1744;
-
-      --accent:#4fc3f7;
-
-      --border:#1c2230;
-
-      --warn:#ffb300;
-
-    }
-
-    *{box-sizing:border-box}
-
-    body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial}
-
-    .wrap{max-width:1120px;margin:0 auto;padding:20px}
-
-    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-
-    .brand{display:flex;align-items:center;gap:10px}
-
-    .logo{width:36px;height:36px;border-radius:8px;background:conic-gradient(from 45deg,var(--accent),#7c4dff,#00e5ff)}
-
-    h1{font-size:18px;margin:0}
-
-    .sub{color:var(--muted);font-size:12px}
-
-    .symbol-tabs{display:flex;gap:8px}
-
-    .tab{padding:8px 12px;border:1px solid var(--border);border-radius:12px;background:var(--panel);cursor:pointer}
-
-    .tab[aria-selected="true"]{border-color:var(--accent)}
-
-    .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
-
-    .label{color:var(--muted);font-size:12px;text-transform:uppercase}
-
-    .value{font-size:24px;font-weight:700;margin-top:4px}
-
-    .delta{font-size:14px;margin-left:8px}
-
-    .btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-
-    button.signal{padding:16px;border-radius:12px;border:1px dashed var(--border);background:transparent;color:var(--muted);cursor:not-allowed;opacity:.6}
-
-    button.signal.suggest-buy{border:1px solid var(--ok);color:var(--ok);box-shadow:0 0 12px rgba(0,200,83,.5);opacity:1}
-
-    button.signal.suggest-sell{border:1px solid var(--bad);color:var(--bad);box-shadow:0 0 12px rgba(255,23,68,.5);opacity:1}
-
-  </style>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pocket Broker Signal — AXP & AAPL</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-
-  <div class="wrap">
-
-    <header>
-
-      <div class="brand">
-
-        <div class="logo"></div>
-
-        <div>
-
-          <h1>Pocket Signal — AXP & AAPL</h1>
-
-          <div class="sub">Live market signals (numbers only)</div>
-
-        </div>
-
-      </div>
-
-      <nav class="symbol-tabs">
-
-        <div class="tab" aria-selected="true" data-symbol="AAPL">APPLE • AAPL</div>
-
-        <div class="tab" aria-selected="false" data-symbol="AXP">AMERICAN EXPRESS • AXP</div>
-
-      </nav>
-
-    </header>
-
-
-    <div class="card">
-
-      <div class="label">Current Market Reading</div>
-
-      <div class="value"><span id="currentPrice">—</span><span class="delta" id="deltaNow">—</span></div>
-
-      <div class="label" style="margin-top:10px">5‑min Ahead Reading</div>
-
-      <div class="value" id="ahead5">—</div>
-
-      <div class="label" style="margin-top:10px">7‑min Direction</div>
-
-      <div class="value" id="dir7">—</div>
-
-      <div class="label" style="margin-top:10px">Projected Δ (7m)</div>
-
-      <div class="value" id="proj7">—</div>
-
-      <div class="label" style="margin-top:10px">Confidence</div>
-
-      <div class="value" id="conf">—</div>
-
-    </div>
-
-
-    <div class="card">
-
-      <div class="label">Action</div>
-
-      <div class="btns">
-
-        <button class="signal" id="sellBtn"><strong>SELL</strong></button>
-
-        <button class="signal" id="buyBtn"><strong>BUY</strong></button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <script>
-
-    const API_KEY = "E8VRPQ2PC6C9NE55"; // replace with your key
-
-    const symbols = { AAPL: [], AXP: [] };
-
-    let active = "AAPL";
-
-
-    async function fetchPrice(symbol){
-
-      const url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=1min&apikey=${API_KEY}`;
-
-      try{
-
-        const res = await fetch(url);
-
-        const data = await res.json();
-
-        const series = data["Time Series (1min)"];
-
-        if(!series) return null;
-
-        const latestTime = Object.keys(series)[0];
-
-        const latestClose = parseFloat(series[latestTime]["4. close"]);
-
-        return {time:latestTime, price:latestClose};
-
-      }catch(e){console.error(e);return null;}
-
-    }
-
-
-    function linearRegression(points){
-
-      const n = points.length;
-
-      if(n<2) return {m:0,b:points[0]?.y||0,r2:0};
-
-      let sumX=0,sumY=0,sumXY=0,sumXX=0;
-
-      points.forEach((p,i)=>{sumX+=i;sumY+=p.y;sumXY+=i*p.y;sumXX+=i*i});
-
-      const m = (n*sumXY - sumX*sumY)/(n*sumXX - sumX*sumX);
-
-      const b = (sumY - m*sumX)/n;
-
-      return {m,b};
-
-    }
-
-
-    function render(){
-
-      const hist = symbols[active];
-
-      if(hist.length<2) return;
-
-      const last = hist[hist.length-1].price;
-
-      const prev = hist[hist.length-2].price;
-
-      const delta = last-prev;
-
-      const {m,b} = linearRegression(hist.map((p,i)=>({t:i,y:p.price})));
-
-      const proj5 = last + m*5;
-
-      const proj7 = last + m*7;
-
-      const changeAbs = proj7-last;
-
-      const changeRel = changeAbs/last;
-
-      let side = "neutral";
-
-      if(changeRel>0.001) side="buy";
-
-      else if(changeRel<-0.001) side="sell";
-
-
-      document.getElementById("currentPrice").textContent = `$${last.toFixed(2)}`;
-
-      document.getElementById("deltaNow").textContent = (delta>=0?"+":"")+delta.toFixed(2);
-
-      document.getElementById("ahead5").textContent = `$${proj5.toFixed(2)}`;
-
-      document.getElementById("dir7").textContent = side==="buy"?"Uptrend":"Downtrend";
-
-      document.getElementById("proj7").textContent = `${changeAbs>=0?"+":""}${changeAbs.toFixed(2)} (${(changeRel*100).toFixed(2)}%)`;
-
-      document.getElementById("conf").textContent = `${(Math.min(1,Math.abs(changeRel)/0.01)*100).toFixed(0)}%`;
-
-
-      const buyBtn=document.getElementById("buyBtn"), sellBtn=document.getElementById("sellBtn");
-
-      buyBtn.classList.remove("suggest-buy");
-
-      sellBtn.classList.remove("suggest-sell");
-
-      if(side==="buy") buyBtn.classList.add("suggest-buy");
-
-      if(side==="sell") sellBtn.classList.add("suggest-sell");
-
-    }
-
-
-    async function update(){
-
-      const p=await fetchPrice(active);
-
-      if(p){symbols[active].push(p); if(symbols[active].length>60) symbols[active].shift();}
-
-      render();
-
-    }
-
-
-    document.querySelectorAll(".tab").forEach(tab=>{
-
-      tab.addEventListener("click",()=>{
-
-        document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected","false"));
-
-        tab.setAttribute("aria-selected","true");
-
-        active=tab.dataset.symbol;
-
-        render();
-
-      });
-
-    });
-
-
-    setInterval(update,60000); // fetch every 1 min
-
-    update();
-
-  </script>
-
+  <div class="container">
+    <h1>Pocket Broker Signal</h1>
+
+    <div class="card" id="AAPL-card">
+      <h2>APPLE (AAPL)</h2>
+      <div class="info">Current: <span id="AAPL-current">—</span></div>
+      <div class="info">5 min ahead: <span id="AAPL-proj">—</span></div>
+      <div class="buttons">
+        <button class="signal" id="AAPL-sell">SELL</button>
+        <button class="signal" id="AAPL-buy">BUY</button>
+      </div>
+    </div>
+
+    <div class="card" id="AXP-card">
+      <h2>AMERICAN EXPRESS (AXP)</h2>
+      <div class="info">Current: <span id="AXP-current">—</span></div>
+      <div class="info">5 min ahead: <span id="AXP-proj">—</span></div>
+      <div class="buttons">
+        <button class="signal" id="AXP-sell">SELL</button>
+        <button class="signal" id="AXP-buy">BUY</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
-
 </html>
-
-
