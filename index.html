@@ -1,33 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pocket Broker Signal — AXP & AAPL</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pocket Broker Signals</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
     <h1>Pocket Broker Signal</h1>
 
-    <div class="card" id="AAPL-card">
-      <h2>APPLE (AAPL)</h2>
-      <div class="info">Current: <span id="AAPL-current">—</span></div>
-      <div class="info">5 min ahead: <span id="AAPL-proj">—</span></div>
+    <div class="stock" id="aapl">
+      <h2>Apple (AAPL)</h2>
+      <p>Current Price: <span class="price" id="aapl-price">--</span></p>
+      <p>5s Ahead Price: <span class="future" id="aapl-future">--</span></p>
       <div class="buttons">
-        <button class="signal" id="AAPL-sell">SELL</button>
-        <button class="signal" id="AAPL-buy">BUY</button>
+        <button id="aapl-sell" class="signal-btn">SELL</button>
+        <button id="aapl-buy" class="signal-btn">BUY</button>
       </div>
+      <p class="suggestion" id="aapl-suggestion">Waiting...</p>
     </div>
 
-    <div class="card" id="AXP-card">
-      <h2>AMERICAN EXPRESS (AXP)</h2>
-      <div class="info">Current: <span id="AXP-current">—</span></div>
-      <div class="info">5 min ahead: <span id="AXP-proj">—</span></div>
+    <div class="stock" id="axp">
+      <h2>American Express (AXP)</h2>
+      <p>Current Price: <span class="price" id="axp-price">--</span></p>
+      <p>5s Ahead Price: <span class="future" id="axp-future">--</span></p>
       <div class="buttons">
-        <button class="signal" id="AXP-sell">SELL</button>
-        <button class="signal" id="AXP-buy">BUY</button>
+        <button id="axp-sell" class="signal-btn">SELL</button>
+        <button id="axp-buy" class="signal-btn">BUY</button>
       </div>
+      <p class="suggestion" id="axp-suggestion">Waiting...</p>
     </div>
   </div>
 
