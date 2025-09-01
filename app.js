@@ -1,73 +1,74 @@
-const API_KEY = "EYNWMFZAC24U7IDC";  // put your real API key here
+const API_KEY = "EYNWMFZAC24U7IDC"; // Replace with your real API key
 const symbols = ["AAPL", "AXP"];
 
-async function fetchStock(symbol) {
+let lastPrices = {};
+
+async function getPrice(symbol) {
   const url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=1min&apikey=${API_KEY}`;
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    return data["Time Series (1min)"] || {};
-  } catch (err) {
-    console.error("Error fetching data:", err);
-    return {};
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (!data["Time Series (1min)"]) {
+    throw new Error("API limit or invalid response");
+  }
+
+  const series = data["Time Series (1min)"];
+  const lastTime = Object.keys(series)[0];
+  const lastClose = parseFloat(series[lastTime]["4. close"]);
+
+  return lastClose;
+}
+
+async function updatePrices() {
+  for (let symbol of symbols) {
+    try {
+      const currentPrice = await getPrice(symbol);
+      const prevPrice = lastPrices[symbol] || currentPrice;
+
+      // Calculate "5s ahead price" as a small trend projection
+      const projected = (currentPrice + (currentPrice - prevPrice)).toFixed(2);
+
+      // Update DOM
+      document.getElementById(symbol.toLowerCase() + "-price").innerText = currentPrice.toFixed(2);
+      document.getElementById(symbol.toLowerCase() + "-future").innerText = projected;
+
+      // Reset buttons to neutral
+      resetButtons(symbol);
+
+      // Suggest after 10 seconds
+      setTimeout(() => {
+        suggestAction(symbol, currentPrice, projected);
+      }, 10000);
+
+      lastPrices[symbol] = currentPrice;
+    } catch (err) {
+      console.error("Error fetching price:", err);
+    }
   }
 }
 
-function linearRegression(prices) {
-  const n = prices.length;
-  const x = [...Array(n).keys()];
-  const y = prices;
-
-  const xMean = x.reduce((a, b) => a + b) / n;
-  const yMean = y.reduce((a, b) => a + b) / n;
-
-  let num = 0, den = 0;
-  for (let i = 0; i < n; i++) {
-    num += (x[i] - xMean) * (y[i] - yMean);
-    den += (x[i] - xMean) ** 2;
-  }
-  const slope = num / den;
-  const intercept = yMean - slope * xMean;
-
-  const nextX = n + 5; // 5 min ahead
-  const futureValue = slope * nextX + intercept;
-
-  return { slope, futureValue };
+function resetButtons(symbol) {
+  document.getElementById(symbol.toLowerCase() + "-buy").className = "signal-btn";
+  document.getElementById(symbol.toLowerCase() + "-sell").className = "signal-btn";
+  document.getElementById(symbol.toLowerCase() + "-suggestion").innerText = "Waiting...";
 }
 
-async function updateStock(symbol) {
-  const data = await fetchStock(symbol);
-  const times = Object.keys(data).sort().reverse();
-  const latest = data[times[0]];
-  const current = latest ? parseFloat(latest["1. open"]) : null;
+function suggestAction(symbol, current, future) {
+  const buyBtn = document.getElementById(symbol.toLowerCase() + "-buy");
+  const sellBtn = document.getElementById(symbol.toLowerCase() + "-sell");
+  const suggestion = document.getElementById(symbol.toLowerCase() + "-suggestion");
 
-  const recent = times.slice(0, 10).map(t => parseFloat(data[t]["1. open"]));
-  let proj = null, slope = 0;
-  if (recent.length >= 2) {
-    const res = linearRegression(recent);
-    proj = res.futureValue;
-    slope = res.slope;
-  }
-
-  document.getElementById(symbol + "-current").innerText = current ? current.toFixed(2) : "—";
-  document.getElementById(symbol + "-proj").innerText = proj ? proj.toFixed(2) : "—";
-
-  const buyBtn = document.getElementById(symbol + "-buy");
-  const sellBtn = document.getElementById(symbol + "-sell");
-
-  buyBtn.classList.remove("active", "buy");
-  sellBtn.classList.remove("active", "sell");
-
-  if (slope > 0) {
-    buyBtn.classList.add("active", "buy");
-  } else if (slope < 0) {
-    sellBtn.classList.add("active", "sell");
+  if (future > current) {
+    buyBtn.classList.add("active-buy");
+    suggestion.innerText = "Suggested: BUY";
+  } else if (future < current) {
+    sellBtn.classList.add("active-sell");
+    suggestion.innerText = "Suggested: SELL";
+  } else {
+    suggestion.innerText = "No clear signal";
   }
 }
 
-function refresh() {
-  symbols.forEach(updateStock);
-}
-
-refresh();
-setInterval(refresh, 60000); // update every 1 min
+// Initial + repeat every 1 min
+updatePrices();
+setInterval(updatePrices, 60000);
