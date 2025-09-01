@@ -1,69 +1,70 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f0f2f5;
+  background: #f5f7fa;
   margin: 0;
   padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
 }
 
 .container {
-  text-align: center;
-}
-
-.card {
-  background: #fff;
+  max-width: 800px;
+  margin: 40px auto;
+  background: white;
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  padding: 20px;
-  margin: 20px;
-  width: 280px;
-  display: inline-block;
 }
 
 h1 {
-  font-size: 24px;
+  text-align: center;
+  color: #333;
+}
+
+.stock {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
   margin-bottom: 20px;
 }
 
-h2 {
-  font-size: 20px;
-  margin-bottom: 10px;
-}
-
-.info {
-  margin: 8px 0;
-  font-size: 16px;
+.price, .future {
+  font-weight: bold;
+  color: #111;
 }
 
 .buttons {
-  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
 }
 
-.signal {
+.signal-btn {
+  flex: 1;
+  margin: 0 5px;
+  padding: 12px;
+  font-size: 18px;
   border: none;
+  border-radius: 8px;
   background: transparent;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 6px;
+  color: #aaa;
   cursor: not-allowed;
-  opacity: 0.4;
-  margin: 5px;
-  transition: 0.3s;
+  transition: all 0.3s ease;
 }
 
-.signal.active.buy {
-  background: #4CAF50;
+.signal-btn.active-buy {
+  background: #4caf50;
   color: white;
-  cursor: pointer;
-  opacity: 1;
+  cursor: default;
 }
 
-.signal.active.sell {
-  background: #E53935;
+.signal-btn.active-sell {
+  background: #f44336;
   color: white;
-  cursor: pointer;
-  opacity: 1;
+  cursor: default;
+}
+
+.suggestion {
+  text-align: center;
+  font-weight: bold;
+  margin-top: 10px;
+  color: #555;
 }
