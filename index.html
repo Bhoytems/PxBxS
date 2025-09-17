@@ -1,245 +1,59 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Pro Trade Analyser (Demo)</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
-<style>
-:root{--bg:#000;--muted:#444;--accent:#b9f2ff}
-html,body{height:100%;margin:0;background:var(--bg);color:#ddd;font-family:Inter,system-ui,Arial}
-.app{display:grid;grid-template-columns:1fr 380px;gap:18px;padding:18px;height:100vh;box-sizing:border-box}
-.panel{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.03)}
-.chart-wrap{padding:6px}
-canvas{background:transparent;border-radius:8px}
-.controls{display:flex;flex-direction:column;gap:10px}
-label{font-size:13px;color:#bbb}
-select,input{background:transparent;border:1px solid var(--muted);padding:8px;border-radius:8px;color:#ddd}
-.buttons{display:flex;gap:10px;align-items:center}
-.btn-unpress{flex:1;padding:16px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#666;font-weight:700;letter-spacing:1px;opacity:0.3;pointer-events:none;transition:all .18s}
-.btn-unpress.suggest-buy{box-shadow:0 0 18px rgba(0,200,120,0.18);opacity:1;color:var(--accent);border-color:rgba(185,242,255,0.06)}
-.btn-unpress.suggest-sell{box-shadow:0 0 18px rgba(200,50,50,0.14);opacity:1;color:#ff9b9b;border-color:rgba(255,155,155,0.06)}
-.meta{font-size:13px;color:#9aa;display:flex;justify-content:space-between}
-.small{font-size:12px;color:#888}
-footer{color:#666;text-align:center;padding:10px}
-@media (max-width:980px){.app{grid-template-columns:1fr}}
-</style>
-
-<!-- Firebase SDKs -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getFunctions } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js";
-
-// TODO: Replace with your project's config object from Firebase Console
-const firebaseConfig = {
-apiKey: "AIzaSyBaGyMzP4z9lXowAf0nmAnmE3NDMKc8LBo",
-authDomain: "pta-995c0.firebaseapp.com",
-projectId: "pta-995c0",
-storageBucket: "pta-995c0.firebasestorage.app",
-messagingSenderId: "590983012317",
-appId: "1:590983012317:web:c7edcd448108b358d2e034",
-measurementId: "G-E14MFN7RYG"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
-const functions = getFunctions(app);
-</script>
+  <meta charset="UTF-8">
+  <title>Pro Trade Analyser (Demo)</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<div class="app">
-<div class="panel">
-<div class="chart-wrap">
-<canvas id="priceChart" height="220"></canvas>
-</div>
-<div class="meta" style="margin-top:8px">
-<div>Pair: <span id="pairLabel">EUR/USD</span></div>
-<div>Last: <strong id="lastPrice">—</strong></div>
-</div>
-<div style="height:12px"></div>
-<div class="buttons">
-<div id="buyBtn" class="btn-unpress">BUY</div>
-<div id="sellBtn" class="btn-unpress">SELL</div>
-</div>
-<div style="height:12px"></div>
-<div class="small">Prediction method: linear-extrapolate from recent velocity (configurable). Suggestion lights up automatically when threshold met.</div>
-</div>
+  <div class="container">
+    <h2>Pro Trade Analyser (Demo)</h2>
+    <div class="panel">
+      <div class="controls">
+        <label>Market</label>
+        <select id="pairSelect">
+          <option value="EUR/USD">EUR/USD</option>
+          <option value="USD/JPY">USD/JPY</option>
+          <option value="AUD/USD">AUD/USD</option>
+          <option value="USD/CAD">USD/CAD</option>
+          <option value="XAU/USD">GOLD (XAU/USD)</option>
+        </select>
 
-<div class="panel">
-<div class="controls">
-<label>Market</label>
-<select id="pairSelect">
-<option value="EUR/USD">EUR/USD</option>
-<option value="USD/JPY">USD/JPY</option>
-<option value="AUD/USD">AUD/USD</option>
-<option value="USD/CAD">USD/CAD</option>
-<option value="XAU/USD">GOLD (XAU/USD)</option>
-</select>
+        <label>Provider</label>
+        <select id="providerSelect">
+          <option value="twelvedata">TwelveData</option>
+          <option value="finnhub">Finnhub</option>
+        </select>
 
-<label>Data Provider</label>
-<select id="providerSelect">
-<option value="twelvedata">TwelveData (REST polling)</option>
-<option value="finnhub">Finnhub (REST polling)</option>
-</select>
+        <label>Update interval (ms)</label>
+        <input id="interval" type="number" value="5000">
 
-<label>API Key</label>
-<input id="apiKey" placeholder="Paste provider API key here" />
+        <label>Prediction horizon (seconds)</label>
+        <input id="horizon" type="number" value="31">
 
-<label>Update interval (ms)</label>
-<input id="interval" type="number" value="1000" />
+        <label>Velocity window (seconds)</label>
+        <input id="velWindow" type="number" value="5">
 
-<label>Prediction horizon (seconds)</label>
-<input id="horizon" type="number" value="31" />
+        <button id="connect">Start</button>
+      </div>
+    </div>
 
-<label>Velocity window (seconds) - use last N seconds to compute slope</label>
-<input id="velWindow" type="number" value="5" />
+    <div class="status">
+      <p>Pair: <span id="pairLabel">EUR/USD</span></p>
+      <p>Last: <span id="lastPrice">—</span></p>
+    </div>
 
-<button id="connect" style="padding:10px;border-radius:8px;background:#111;color:#fff;border:1px solid var(--muted)">Start</button>
+    <div class="buttons">
+      <button id="buyBtn" class="btn">BUY</button>
+      <button id="sellBtn" class="btn">SELL</button>
+    </div>
 
-<div class="small">Note: For production do not expose your API key in frontend. Use a backend proxy (Firebase Function, Vercel serverless) to keep it secret.</div>
-</div>
-</div>
-</div>
-<footer class="small">Demo app — analytics only. Not financial advice.</footer>
+    <canvas id="priceChart" width="600" height="300"></canvas>
 
-<script>
-// Simple single-file demo: polls a provider for latest price every interval, keeps a buffer, predicts forward by linear extrapolation
-const chartCtx = document.getElementById('priceChart').getContext('2d');
-let chart;
-const dataBuffer = []; // {t: timestamp_ms, p: price}
+    <p class="note">Demo app — analytics only. Not financial advice.</p>
+  </div>
 
-function makeChart(){
-const config = {
-type: 'line',
-data: {labels:[], datasets:[{label:'Price',data:[],pointRadius:0,fill:false}]},
-options: {
-animation:false,
-normalized:true,
-plugins:{legend:{display:false}},
-scales:{x:{type:'time',time:{unit:'second'},ticks:{color:'#999'}},y:{ticks:{color:'#999'}}}
-}
-}
-chart = new Chart(chartCtx, config);
-}
-
-makeChart();
-
-const pairSelect = document.getElementById('pairSelect');
-const providerSelect = document.getElementById('providerSelect');
-const apiKeyInput = document.getElementById('apiKey');
-const intervalInput = document.getElementById('interval');
-const connectBtn = document.getElementById('connect');
-const lastPriceEl = document.getElementById('lastPrice');
-const pairLabel = document.getElementById('pairLabel');
-const buyBtn = document.getElementById('buyBtn');
-const sellBtn = document.getElementById('sellBtn');
-const horizonInput = document.getElementById('horizon');
-const velWindowInput = document.getElementById('velWindow');
-
-let timer = null;
-
-connectBtn.addEventListener('click', ()=>{
-if(timer) { clearInterval(timer); timer=null; connectBtn.textContent='Start'; return; }
-const ms = parseInt(intervalInput.value)||1000;
-connectBtn.textContent='Stop';
-tick();
-timer = setInterval(tick, ms);
-});
-
-function addSample(price){
-const now = Date.now();
-dataBuffer.push({t:now,p:price});
-// keep last 120s
-const cutoff = now - 120000;
-while(dataBuffer.length && dataBuffer[0].t < cutoff) dataBuffer.shift();
-updateChart();
-}
-
-function updateChart(){
-chart.data.labels = dataBuffer.map(d=>new Date(d.t));
-chart.data.datasets[0].data = dataBuffer.map(d=>d.p);
-chart.update('none');
-if(dataBuffer.length) lastPriceEl.textContent = dataBuffer[dataBuffer.length-1].p.toFixed(5);
-}
-
-async function tick(){
-const provider = providerSelect.value;
-const pair = pairSelect.value;
-const apiKey = apiKeyInput.value.trim();
-pairLabel.textContent = pair;
-try{
-const price = await fetchPrice(provider,pair,apiKey);
-if(typeof price === 'number'){ addSample(price); analyzeAndSuggest(); }
-}catch(e){ console.warn('fetch error',e); }
-}
-
-async function fetchPrice(provider,pair,apiKey){
-// pair normalization
-const mapPair = pair.replace('/','/');
-if(!apiKey) {
-// no API key - simulate
-const last = dataBuffer.length?dataBuffer[dataBuffer.length-1].p:1.10000;
-const randomWalk = last * (1 + (Math.random()-0.5)*0.0003);
-return Number(randomWalk.toFixed(5));
-}
-if(provider==='twelvedata'){
-const url = `https://api.twelvedata.com/price?symbol=${encodeURIComponent(mapPair)}&apikey=${encodeURIComponent(apiKey)}`;
-const res = await fetch(url);
-const j = await res.json();
-if(j && j.price) return Number(j.price);
-throw new Error('no price');
-}
-if(provider==='finnhub'){
-const sym = 'OANDA:' + pair.replace('/','_');
-const url = `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(sym)}&token=${encodeURIComponent(apiKey)}`;
-const res = await fetch(url);
-const j = await res.json();
-if(j && typeof j.c === 'number') return Number(j.c);
-throw new Error('no price');
-}
-throw new Error('unknown provider');
-}
-
-function analyzeAndSuggest(){
-const horizon = Number(horizonInput.value)||31;
-const velWindow = Number(velWindowInput.value)||5;
-const now = Date.now();
-const cutoff = now - velWindow*1000;
-const samples = dataBuffer.filter(d=>d.t>=cutoff);
-if(samples.length < 2) return clearSuggest();
-let sx=0, sy=0, sxx=0, sxy=0; const n=samples.length;
-const base = samples[0].t;
-for(const s of samples){ const x = s.t - base; const y = s.p; sx += x; sy += y; sxx += x*x; sxy += x*y; }
-const denom = (n*sxx - sx*sx) || 1;
-const slope = (n*sxy - sx*sy)/denom;
-const last = samples[samples.length-1].p;
-const predictPrice = last + slope*(horizon*1000);
-
-const relChange = (predictPrice - last)/last;
-const threshold = 0.00012;
-
-if(relChange > threshold){ showSuggest('buy'); }
-else if(relChange < -threshold){ showSuggest('sell'); }
-else { clearSuggest(); }
-}
-
-function showSuggest(type){
-if(type==='buy'){ buyBtn.classList.add('suggest-buy'); sellBtn.classList.remove('suggest-sell'); }
-if(type==='sell'){ sellBtn.classList.add('suggest-sell'); buyBtn.classList.remove('suggest-buy'); }
-}
-function clearSuggest(){ buyBtn.classList.remove('suggest-buy'); sellBtn.classList.remove('suggest-sell'); }
-
-(function seed(){
-const now = Date.now();
-let p = 1.10000;
-for(let i=60;i>0;i--){ p = p*(1 + (Math.random()-0.5)*0.0004); dataBuffer.push({t:now - i*1000, p}); }
-updateChart();
-})();
-</script>
+  <script src="main.js"></script>
 </body>
 </html>
