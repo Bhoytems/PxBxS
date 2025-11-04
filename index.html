@@ -1,286 +1,311 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Free Fire Sensitivity Finder</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{--accent:#2563eb;--muted:#6b7280;--bg:#ffffff}
-    *{box-sizing:border-box}
-    body{font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:#0f172a;margin:0;padding:32px}
-    .wrap{max-width:920px;margin:0 auto}
-    .card{background:#fff;border:1px solid #e6edf8;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.06);padding:24px}
-    .top-image{height:160px;border-radius:10px;background:linear-gradient(90deg,#eef2ff,#fef3c7);display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:600;margin-bottom:18px}
-    h1{font-size:20px;margin:0 0 8px}
-    p.lead{margin:0 0 18px;color:var(--muted)}
-    .row{display:flex;gap:12px}
-    .col{flex:1}
-    label{display:block;font-size:13px;color:#0f172a;margin-bottom:6px}
-    input[type="text"], select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #dbeafe;background:#fff}
-    .radio-row{display:flex;gap:12px;align-items:center;margin:8px 0 18px}
-    .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-weight:600;cursor:pointer}
-    .btn.secondary{background:#111827}
-    .btn.ghost{background:transparent;color:var(--accent);border:1px dashed #c7d2fe}
-    .btn[disabled]{opacity:0.5;cursor:not-allowed}
-    .sensi-result{margin-top:18px;padding:14px;border-radius:8px;border:1px dashed #e6edf8;background:#fbfdff}
-    .sensi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-    .sensi-item{padding:10px;border-radius:8px;background:white;border:1px solid #eef2ff}
-    .small{font-size:12px;color:var(--muted)}
-    .hint{font-size:13px;color:var(--muted);margin-top:12px}
-    .vis-steps{display:flex;gap:12px;flex-direction:column;margin-top:12px}
-    a.link{color:var(--accent);text-decoration:none}
-    @media (max-width:680px){.row{flex-direction:column}}
-  </style>
+
+<meta charset="UTF-8">
+
+<title>Pro v3 Crypto + Forex Signal Analyzer</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+  body {font-family:'Poppins',sans-serif;background:#0d1117;color:#f0f6fc;text-align:center;padding:20px;}
+
+  .box{background:#161b22;padding:25px;border-radius:15px;max-width:750px;margin:auto;box-shadow:0 0 20px #000;}
+
+  h2{color:#58a6ff;}
+
+  select,button{margin:10px;padding:10px;border:none;border-radius:6px;background:#21262d;color:#fff;}
+
+  button{background:#238636;cursor:pointer;transition:.3s;}button:hover{background:#2ea043;}
+
+  .signal{font-size:1.8em;font-weight:bold;margin-top:15px;}
+
+  .buy{color:#2ea043;}.sell{color:#f85149;}.hold{color:#f0f6fc;}
+
+  .strength{font-weight:bold;margin-top:5px;}
+
+  canvas{margin-top:20px;background:#0d1117;border-radius:10px;}
+
+</style>
+
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="top-image">Top banner image (add your image later)</div>
-      <h1>Free Fire Sensitivity Finder</h1>
-      <p class="lead">Pick your device and model, choose DPI option, then click <strong>Get Sensi</strong> to reveal recommended sensitivities.</p><div class="row">
-    <div class="col">
-      <label for="device">Device</label>
-      <select id="device" aria-label="Device selector">
-        <option value="">-- choose device or type below --</option>
-        <option>Samsung Galaxy S9</option>
-        <option>Samsung Galaxy S10</option>
-        <option>Samsung Galaxy S20</option>
-        <option>Samsung Galaxy S21</option>
-        <option>Samsung Galaxy S22</option>
-        <option>Samsung Galaxy S23</option>
-        <option>iPhone 8</option>
-        <option>iPhone X</option>
-        <option>iPhone 11</option>
-        <option>iPhone 12</option>
-        <option>iPhone 13</option>
-        <option>Xiaomi Redmi Note 8</option>
-        <option>Xiaomi Redmi Note 10</option>
-        <option>Infinix Hot 10</option>
-        <option>Tecno Spark 7</option>
-        <option>OnePlus 6</option>
-        <option>OnePlus 7</option>
-        <option>Google Pixel 4</option>
-        <option>Google Pixel 6</option>
-        <option>Oppo A5</option>
-        <option>Realme 6</option>
-        <option>Huawei P30</option>
-        <option>Custom Device (type below)</option>
-      </select>
-    </div>
-    <div class="col">
-      <label for="model">Model (exact / optional)</label>
-      <input id="model" type="text" placeholder="e.g. SM-G960F / Ex: 128GB" />
-    </div>
-  </div>
 
-  <div style="margin-top:14px">
-    <label class="small">DPI option</label>
-    <div class="radio-row">
-      <label><input type="radio" name="dpi" value="without" checked /> Without DPI</label>
-      <label><input type="radio" name="dpi" value="with" /> With DPI (extra verification steps)</label>
-    </div>
-  </div>
+<div class="box">
 
-  <div id="dpi-steps" style="display:none">
-    <div class="hint">Because you chose <strong>With DPI</strong>, please visit the two pages below (placeholders) before you can get the sensitivity. Each step unlocks after a 5s wait.</div>
-    <div class="vis-steps">
-      <button id="visit1" class="btn ghost" data-link="#replace-link-1">Visit page 1 (placeholder)</button>
-      <button id="visit2" class="btn ghost" disabled data-link="#replace-link-2">Visit page 2 (placeholder)</button>
-    </div>
-  </div>
+  <h2>📈 Pro v3 Crypto + Forex Signal Analyzer</h2>
 
-  <div style="margin-top:16px;display:flex;gap:12px;align-items:center">
-    <button id="getSensi" class="btn" disabled data-redirect="#add-your-link-here">Get Sensi</button>
-    <div id="status" class="small" style="color:var(--muted)"></div>
-  </div>
+  <p>Now with EMA + RSI Confirmation</p>
 
-  <div id="result" class="sensi-result" style="display:none">
-    <div class="small">Results for <strong id="res-device"></strong> <span id="res-model"></span> — <em id="res-mode"></em></div>
-    <div class="sensi-grid" style="margin-top:12px">
-      <div class="sensi-item"><div class="small">General</div><div id="s-general" style="font-weight:700;font-size:18px;margin-top:6px">—</div></div>
-      <div class="sensi-item"><div class="small">Red dot</div><div id="s-reddot" style="font-weight:700;font-size:18px;margin-top:6px">—</div></div>
-      <div class="sensi-item"><div class="small">2X</div><div id="s-2x" style="font-weight:700;font-size:18px;margin-top:6px">—</div></div>
-      <div class="sensi-item"><div class="small">4X</div><div id="s-4x" style="font-weight:700;font-size:18px;margin-top:6px">—</div></div>
-      <div class="sensi-item"><div class="small">Sniper</div><div id="s-sniper" style="font-weight:700;font-size:18px;margin-top:6px">—</div></div>
-      <div class="sensi-item"><div class="small">Free look</div><div id="s-freelook" style="font-weight:700;font-size:18px;margin-top:6px">—</div></div>
-      <div class="sensi-item"><div class="small">Fire button</div><div id="s-fire" style="font-weight:700;font-size:18px;margin-top:6px">—</div></div>
-    </div>
-    <div class="hint">Tip: You can edit the data set inside the page (script) to add or adjust device-specific sensitivities.</div>
-  </div>
+  <div>
+
+    <select id="market" onchange="updateAssetOptions()">
+
+      <option value="crypto">Crypto</option>
+
+      <option value="forex">Forex</option>
+
+    </select>
+
+    <select id="asset"></select>
+
+    <select id="timeframe">
+
+      <option value="1m">1 Minute</option>
+
+      <option value="3m">3 Minutes</option>
+
+      <option value="5m" selected>5 Minutes</option>
+
+    </select>
+
+    <button onclick="generateSignal()">🔍 Analyze</button>
+
+  </div>
+
+  <div id="output"></div>
+
+  <canvas id="priceChart" height="150"></canvas>
 
 </div>
 
-<p style="text-align:center;color:var(--muted);font-size:13px;margin-top:10px">Ready to deploy — export this file to your GitHub repo and enable GitHub Pages (branch: main or gh-pages).</p>
 
-  </div>  <script>
-    // === Sample dataset: edit these values as you like ===
-    const DATA = {
-      "Samsung Galaxy S9": {
-        withDPI: {general:52,reddot:46,'2x':30,'4x':22,sniper:21,freelook:50,fire:100},
-        withoutDPI: {general:45,reddot:40,'2x':28,'4x':20,sniper:19,freelook:45,fire:95}
-      },
-      "Samsung Galaxy S21": {
-        withDPI: {general:56,reddot:48,'2x':33,'4x':24,sniper:22,freelook:52,fire:102},
-        withoutDPI: {general:50,reddot:44,'2x':30,'4x':22,sniper:20,freelook:48,fire:98}
-      },
-      "iPhone 11": {
-        withDPI: {general:54,reddot:47,'2x':32,'4x':23,sniper:22,freelook:51,fire:101},
-        withoutDPI: {general:49,reddot:43,'2x':29,'4x':21,sniper:20,freelook:47,fire:97}
-      },
-      "Xiaomi Redmi Note 8": {
-        withDPI: {general:48,reddot:42,'2x':28,'4x':20,sniper:18,freelook:44,fire:92},
-        withoutDPI: {general:42,reddot:38,'2x':26,'4x':19,sniper:17,freelook:40,fire:88}
-      },
-      "Infinix Hot 10": {
-        withDPI: {general:46,reddot:40,'2x':26,'4x':18,sniper:17,freelook:42,fire:90},
-        withoutDPI: {general:40,reddot:36,'2x':24,'4x':17,sniper:16,freelook:38,fire:86}
-      },
-      "Default": {
-        withDPI: {general:50,reddot:44,'2x':30,'4x':22,sniper:20,freelook:48,fire:98},
-        withoutDPI: {general:45,reddot:40,'2x':28,'4x':20,sniper:19,freelook:45,fire:95}
-      }
-    };
+<script>
 
-    // UI elements
-    const deviceEl = document.getElementById('device');
-    const modelEl = document.getElementById('model');
-    const getBtn = document.getElementById('getSensi');
-    const statusEl = document.getElementById('status');
-    const dpiSteps = document.getElementById('dpi-steps');
-    const visit1 = document.getElementById('visit1');
-    const visit2 = document.getElementById('visit2');
-    const resultCard = document.getElementById('result');
+const cryptoAssets = {
 
-    const resDevice = document.getElementById('res-device');
-    const resModel = document.getElementById('res-model');
-    const resMode = document.getElementById('res-mode');
+  BTCUSDT:"Bitcoin (BTC/USDT)",
 
-    const fields = ['s-general','s-reddot','s-2x','s-4x','s-sniper','s-freelook','s-fire'].map(id=>document.getElementById(id));
+  ETHUSDT:"Ethereum (ETH/USDT)",
 
-    // helper
-    function getSelectedDpi(){return document.querySelector('input[name="dpi"]:checked').value}
-    function allInputsFilled(){return (deviceEl.value.trim() !== '' && modelEl.value.trim() !== '')}
+  SOLUSDT:"Solana (SOL/USDT)",
 
-    function updateButtonState(){
-      const dpi = getSelectedDpi();
-      if(!allInputsFilled()){
-        getBtn.disabled = true; statusEl.textContent = 'Enter device and model to enable.'; return;
-      }
-      if(dpi === 'with'){
-        // require the two visits to be completed
-        if(!visit1.dataset.clicked){ getBtn.disabled = true; statusEl.textContent = 'Please visit page 1 first.'; return; }
-        if(!visit2.dataset.clicked){ getBtn.disabled = true; statusEl.textContent = 'Please visit page 2 next.'; return; }
-        // if both clicked, the get button will only be enabled after those timers
-        if(visit1.dataset.clicked && visit2.dataset.clicked && visit2.dataset.unlocked === 'true'){
-          getBtn.disabled = false; statusEl.textContent = 'Ready — click Get Sensi (will reveal after 5s).'; return;
-        }
-        getBtn.disabled = true; statusEl.textContent = 'Waiting for unlocking steps...';
-      } else {
-        getBtn.disabled = false; statusEl.textContent = 'Ready — click Get Sensi (will reveal after 5s).';
-      }
-    }
+  DOGEUSDT:"Dogecoin (DOGE/USDT)",
 
-    // DPI radio change
-    document.querySelectorAll('input[name="dpi"]').forEach(r=>r.addEventListener('change', e=>{
-      if(e.target.value === 'with') dpiSteps.style.display = 'block'; else dpiSteps.style.display = 'none';
-      // reset visit buttons state when switching
-      visit1.disabled = false; visit1.textContent = 'Visit page 1 (placeholder)'; visit1.dataset.clicked = '';
-      visit2.disabled = true; visit2.textContent = 'Visit page 2 (placeholder)'; visit2.dataset.clicked = '';
-      visit2.dataset.unlocked = 'false';
-      getBtn.disabled = true; statusEl.textContent = '';
-      updateButtonState();
-    }));
+  ADAUSDT:"Cardano (ADA/USDT)"
 
-    // input listeners
-    deviceEl.addEventListener('input', updateButtonState);
-    modelEl.addEventListener('input', updateButtonState);
-    deviceEl.addEventListener('change', ()=>{
-      // if user selects 'Custom Device', keep the model input; otherwise prefill model placeholder
-      if(deviceEl.value === 'Custom Device (type below)') modelEl.placeholder = 'Type your device & model here';
-      else modelEl.placeholder = 'e.g. SM-G960F / Ex: 128GB';
-      updateButtonState();
-    });
+};
 
-    // Visit buttons behavior (with delays)
-    visit1.addEventListener('click', ()=>{
-      const url = visit1.dataset.link || '#replace-link-1';
-      window.open(url, '_blank');
-      visit1.disabled = true; visit1.dataset.clicked = 'true'; visit1.textContent = 'Visited ✓ (unlocking...)';
-      statusEl.textContent = 'Unlocking step 1...';
-      // after 5s enable visit2
-      setTimeout(()=>{
-        visit2.disabled = false; visit2.textContent = 'Visit page 2 (placeholder)'; visit2.dataset.unlocked = 'true';
-        statusEl.textContent = 'Step 1 unlocked. Now visit page 2.';
-        updateButtonState();
-      },5000);
-    });
+const forexAssets = {
 
-    visit2.addEventListener('click', ()=>{
-      const url = visit2.dataset.link || '#replace-link-2';
-      window.open(url, '_blank');
-      visit2.disabled = true; visit2.dataset.clicked = 'true'; visit2.textContent = 'Visited ✓ (finalizing...)';
-      statusEl.textContent = 'Unlocking step 2...';
-      // after 5s enable Get Sensi (but keep validation for inputs)
-      setTimeout(()=>{
-        visit2.dataset.unlocked = 'true';
-        statusEl.textContent = 'All verification steps complete. You can now get sensitivity.';
-        updateButtonState();
-      },5000);
-    });
+  "EURUSD=X":"EUR/USD","GBPUSD=X":"GBP/USD","USDJPY=X":"USD/JPY","AUDUSD=X":"AUD/USD","USDCAD=X":"USD/CAD"
 
-    // Get Sensi behavior: reveal after 5s and redirect if data-redirect is set (replace later)
-    getBtn.addEventListener('click', ()=>{
-      // disable UI while revealing
-      getBtn.disabled = true; getBtn.textContent = 'Preparing...'; statusEl.textContent = 'Revealing sensitivity in 5s...';
-      // perform 5s delay
-      setTimeout(()=>{
-        showSensitivity();
-        getBtn.textContent = 'Get Sensi';
-        // optional redirect: if you want to redirect, set data-redirect attribute on the button to your URL
-        const redirect = getBtn.dataset.redirect;
-        if(redirect && redirect !== '#add-your-link-here'){
-          // open in new tab so user can still see results
-          window.open(redirect, '_blank');
-        }
-        updateButtonState();
-      },5000);
-    });
+};
 
-    function showSensitivity(){
-      const device = deviceEl.value || 'Custom Device';
-      const model = modelEl.value ? `(${modelEl.value.trim()})` : '';
-      const dpi = getSelectedDpi() === 'with' ? 'With DPI' : 'Without DPI';
+let chart;
 
-      resDevice.textContent = device;
-      resModel.textContent = model;
-      resMode.textContent = dpi;
 
-      // pick data
-      const key = DATA[device] ? device : 'Default';
-      const vals = (getSelectedDpi() === 'with') ? DATA[key].withDPI : DATA[key].withoutDPI;
+// --- Helper functions ---
 
-      // fill UI
-      fields[0].textContent = vals.general;
-      fields[1].textContent = vals.reddot;
-      fields[2].textContent = vals['2x'];
-      fields[3].textContent = vals['4x'];
-      fields[4].textContent = vals.sniper;
-      fields[5].textContent = vals.freelook;
-      fields[6].textContent = vals.fire;
+function updateAssetOptions(){
 
-      resultCard.style.display = 'block';
-      statusEl.textContent = 'Sensitivity revealed.';
-    }
+  const market=document.getElementById("market").value;
 
-    // initial update
-    updateButtonState();
+  const assetSel=document.getElementById("asset");
 
-    // === Notes for you (edit in code):
-    // - Replace top-image placeholder with your actual banner image HTML (img tag).
-    // - Replace visit1.dataset.link and visit2.dataset.link values in the HTML or dynamically to your real pages.
-    // - Replace getSensi.dataset.redirect with your redirect URL if you want the button to navigate.
-    // - Edit the DATA object above to add more devices and exact sensitivity values (withDPI / withoutDPI).
-  </script></body>
+  assetSel.innerHTML="";
+
+  const assets=market==="crypto"?cryptoAssets:forexAssets;
+
+  for(const[k,v]of Object.entries(assets)){
+
+    const opt=document.createElement("option");opt.value=k;opt.textContent=v;assetSel.appendChild(opt);
+
+  }
+
+  document.getElementById("timeframe").disabled=(market==="forex");
+
+}
+
+updateAssetOptions();
+
+
+function SMA(arr,period){return arr.slice(-period).reduce((a,b)=>a+b,0)/period;}
+
+function EMA(prices,period){
+
+  const k=2/(period+1);
+
+  let emaArr=[prices[0]];
+
+  for(let i=1;i<prices.length;i++){
+
+    emaArr.push(prices[i]*k + emaArr[i-1]*(1-k));
+
+  }
+
+  return emaArr;
+
+}
+
+function RSI(prices,period=14){
+
+  let gains=[],losses=[];
+
+  for(let i=1;i<prices.length;i++){
+
+    let diff=prices[i]-prices[i-1];
+
+    gains.push(diff>0?diff:0);
+
+    losses.push(diff<0?Math.abs(diff):0);
+
+  }
+
+  const avgGain=SMA(gains,period);
+
+  const avgLoss=SMA(losses,period);
+
+  if(avgLoss===0) return 100;
+
+  const rs=avgGain/avgLoss;
+
+  return 100 - (100/(1+rs));
+
+}
+
+
+// --- Main Function ---
+
+async function generateSignal(){
+
+  const market=document.getElementById("market").value;
+
+  const asset=document.getElementById("asset").value;
+
+  const tf=document.getElementById("timeframe").value;
+
+  const out=document.getElementById("output");
+
+  out.innerHTML="<p>Fetching data...</p>";
+
+
+  try{
+
+    let prices=[],labels=[];
+
+    if(market==="crypto"){
+
+      const url=`https://api.binance.com/api/v3/klines?symbol=${asset}&interval=${tf}&limit=100`;
+
+      const res=await fetch(url);const data=await res.json();
+
+      prices=data.map(p=>parseFloat(p[4]));
+
+      labels=data.map(p=>new Date(p[0]).toLocaleTimeString());
+
+    }else{
+
+      // Static forex data fallback
+
+      const sample=[1.085,1.086,1.087,1.084,1.083,1.082,1.085,1.088,1.09,1.091,1.092,1.091,1.089,1.087,1.086,1.088,1.09,1.092,1.093,1.094,1.095];
+
+      prices=sample;labels=Array(sample.length).fill("").map((_,i)=>`Day ${i+1}`);
+
+    }
+
+
+    const current=prices.at(-1);
+
+    const ema9=EMA(prices,9).at(-1);
+
+    const ema21=EMA(prices,21).at(-1);
+
+    const rsi=RSI(prices,14);
+
+
+    let signal="HOLD",strength="Weak";
+
+    if(ema9>ema21 && rsi>55) { signal="BUY"; strength=rsi>65?"Strong":"Moderate"; }
+
+    else if(ema9<ema21 && rsi<45){ signal="SELL"; strength=rsi<35?"Strong":"Moderate"; }
+
+
+    const colorClass=signal==="BUY"?"buy":signal==="SELL"?"sell":"hold";
+
+    const validity=market==="crypto"?(tf==="1m"?"≈2-5 min":tf==="3m"?"≈10 min":"≈15-30 min"):"≈1-3 days";
+
+
+    out.innerHTML=`
+
+      <p><b>Market:</b> ${market.toUpperCase()} | <b>Asset:</b> ${(market==="crypto"?cryptoAssets[asset]:forexAssets[asset])}</p>
+
+      <p><b>Timeframe:</b> ${tf} | <b>Current Price:</b> $${current.toFixed(4)}</p>
+
+      <p>EMA(9): $${ema9.toFixed(4)} | EMA(21): $${ema21.toFixed(4)} | RSI(14): ${rsi.toFixed(2)}</p>
+
+      <div class="signal ${colorClass}">Signal: ${signal}</div>
+
+      <div class="strength">📈 Strength: ${strength}</div>
+
+      <p>🕒 Valid for ${validity}</p>
+
+    `;
+
+
+    const ctx=document.getElementById("priceChart");
+
+    if(chart) chart.destroy();
+
+    chart=new Chart(ctx,{
+
+      type:"line",
+
+      data:{
+
+        labels:labels,
+
+        datasets:[
+
+          {label:"Price",data:prices,borderColor:"#58a6ff",tension:.3,fill:false},
+
+          {label:"EMA(9)",data:EMA(prices,9),borderColor:"#2ea043",tension:.3,fill:false},
+
+          {label:"EMA(21)",data:EMA(prices,21),borderColor:"#f85149",tension:.3,fill:false}
+
+        ]
+
+      },
+
+      options:{
+
+        plugins:{legend:{labels:{color:'#fff'}}},
+
+        scales:{x:{ticks:{color:'#ccc'}},y:{ticks:{color:'#ccc'}}}
+
+      }
+
+    });
+
+  }catch(e){
+
+    out.innerHTML=`<p style="color:red;">Error: ${e.message}</p>`;
+
+  }
+
+}
+
+
+// Auto-refresh every 60s
+
+setInterval(()=>{
+
+  if(document.getElementById("market").value==="crypto"){
+
+    generateSignal();
+
+  }
+
+},60000);
+
+</script>
+
+</body>
+
 </html>
+
