@@ -1,61 +1,63 @@
 body {
   font-family: 'Poppins', sans-serif;
-  background: #0d1117;
+  background: radial-gradient(circle at top, #0e111a, #000);
   color: #f0f6fc;
   text-align: center;
   padding: 20px;
 }
 
 .box {
-  background: #161b22;
-  padding: 25px;
-  border-radius: 15px;
-  max-width: 750px;
+  background: rgba(22, 27, 34, 0.8);
+  backdrop-filter: blur(12px);
+  padding: 30px;
+  border-radius: 20px;
+  max-width: 850px;
   margin: auto;
-  box-shadow: 0 0 20px #000;
+  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  transition: all .3s ease;
+}
+
+.box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 40px rgba(56,139,253,0.3);
 }
 
 h2 {
   color: #58a6ff;
+  font-size: 1.9em;
 }
 
-select,
-button {
+select, button, label {
   margin: 10px;
-  padding: 10px;
+  padding: 10px 14px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #21262d;
   color: #fff;
+  font-size: 0.95em;
+  outline: none;
 }
 
 button {
-  background: #238636;
+  background: linear-gradient(90deg, #238636, #2ea043);
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.3s ease;
 }
 
 button:hover {
-  background: #2ea043;
+  background: linear-gradient(90deg, #2ea043, #3fb950);
+  transform: scale(1.05);
 }
 
 .signal {
-  font-size: 1.8em;
+  font-size: 2em;
   font-weight: bold;
   margin-top: 15px;
 }
 
-.buy {
-  color: #2ea043;
-}
-
-.sell {
-  color: #f85149;
-}
-
-.hold {
-  color: #f0f6fc;
-}
+.buy { color: #3fb950; }
+.sell { color: #f85149; }
+.hold { color: #c9d1d9; }
 
 .strength {
   font-weight: bold;
@@ -63,7 +65,26 @@ button:hover {
 }
 
 canvas {
-  margin-top: 20px;
+  margin-top: 25px;
   background: #0d1117;
-  border-radius: 10px;
+  border-radius: 12px;
+}
+
+footer {
+  margin-top: 20px;
+  font-size: 0.8em;
+  color: #777;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.toggle input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
 }
