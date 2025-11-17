@@ -1,31 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Pro v3 Crypto + Forex Signal Analyzer</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<title>Pro v3.6 Crypto + Forex Signal Analyzer</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-  <div class="box">
-    <h2>📈 Pro v3 Crypto + Forex Signal Analyzer</h2>
-    <p>Now with EMA + RSI Confirmation</p>
-    <div>
-      <select id="market" onchange="updateAssetOptions()">
-        <option value="crypto">Crypto</option>
-        <option value="forex">Forex</option>
-      </select>
-      <select id="asset"></select>
-      <select id="timeframe">
-        <option value="1m">1 Minute</option>
-        <option value="3m">3 Minutes</option>
-        <option value="5m" selected>5 Minutes</option>
-      </select>
-      <button onclick="generateSignal()">🔍 Analyze</button>
-    </div>
-    <div id="output"></div>
-    <canvas id="priceChart" height="150"></canvas>
+<div class="box">
+  <h2>📊 Pro v3.6 Crypto + Forex Signal Analyzer</h2>
+  <p>Enhanced with 5s & 30s timeframe + TwelveData API + Auto Refresh Control</p>
+
+  <div>
+    <select id="market" onchange="updateAssetOptions()">
+      <option value="crypto">Crypto</option>
+      <option value="forex">Forex</option>
+    </select>
+
+    <select id="asset"></select>
+
+    <select id="timeframe">
+      <option value="5s">5 Seconds</option>
+      <option value="30s">30 Seconds</option>
+      <option value="1m" selected>1 Minute</option>
+      <option value="3m">3 Minutes</option>
+      <option value="5m">5 Minutes</option>
+    </select>
+
+    <button onclick="generateSignal()">🔍 Analyze</button>
+
+    <label class="toggle">
+      <input type="checkbox" id="autoRefresh" onchange="toggleAutoRefresh()">
+      Auto Refresh
+    </label>
   </div>
-  <script src="script.js"></script>
+
+  <div id="output"></div>
+  <canvas id="priceChart" height="150"></canvas>
+</div>
+
+<footer>Powered by Binance & TwelveData API | UI Upgrade © 2025</footer>
+
+<script src="script.js"></script>
 </body>
 </html>
