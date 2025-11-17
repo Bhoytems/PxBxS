@@ -7,28 +7,28 @@ const cryptoAssets = {
 };
 
 const forexAssets = {
-  "EURUSD=X": "EUR/USD",
-  "GBPUSD=X": "GBP/USD",
-  "USDJPY=X": "USD/JPY",
-  "AUDUSD=X": "AUD/USD",
-  "USDCAD=X": "USD/CAD"
+  "EUR/USD": "EUR/USD",
+  "GBP/USD": "GBP/USD",
+  "USD/JPY": "USD/JPY",
+  "AUD/USD": "AUD/USD",
+  "USD/CAD": "USD/CAD"
 };
 
 let chart;
+let autoRefreshInterval = null;
 
-// --- Helper functions ---
 function updateAssetOptions() {
   const market = document.getElementById("market").value;
   const assetSel = document.getElementById("asset");
   assetSel.innerHTML = "";
   const assets = market === "crypto" ? cryptoAssets : forexAssets;
+
   for (const [k, v] of Object.entries(assets)) {
     const opt = document.createElement("option");
     opt.value = k;
     opt.textContent = v;
     assetSel.appendChild(opt);
   }
-  document.getElementById("timeframe").disabled = (market === "forex");
 }
 updateAssetOptions();
 
@@ -59,13 +59,13 @@ function RSI(prices, period = 14) {
   return 100 - (100 / (1 + rs));
 }
 
-// --- Main Function ---
 async function generateSignal() {
   const market = document.getElementById("market").value;
   const asset = document.getElementById("asset").value;
   const tf = document.getElementById("timeframe").value;
   const out = document.getElementById("output");
-  out.innerHTML = "<p>Fetching data...</p>";
+
+  out.innerHTML = "<p>⏳ Fetching live data...</p>";
 
   try {
     let prices = [], labels = [];
@@ -74,12 +74,27 @@ async function generateSignal() {
       const url = `https://api.binance.com/api/v3/klines?symbol=${asset}&interval=${tf}&limit=100`;
       const res = await fetch(url);
       const data = await res.json();
+
       prices = data.map(p => parseFloat(p[4]));
       labels = data.map(p => new Date(p[0]).toLocaleTimeString());
+
     } else {
-      const sample = [1.085,1.086,1.087,1.084,1.083,1.082,1.085,1.088,1.09,1.091,1.092,1.091,1.089,1.087,1.086,1.088,1.09,1.092,1.093,1.094,1.095];
-      prices = sample;
-      labels = Array(sample.length).fill("").map((_, i) => `Day ${i + 1}`);
+      const tfMap = {
+        "5s": "5s",
+        "30s": "30s",
+        "1m": "1min",
+        "3m": "3min",
+        "5m": "5min"
+      };
+
+      const url = `https://api.twelvedata.com/time_series?symbol=${asset}&interval=${tfMap[tf]}&outputsize=100&apikey=2fb822c09c1c42e19c07e94090f18b42`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!data.values) throw new Error(data.message || "Invalid response");
+
+      prices = data.values.reverse().map(p => parseFloat(p.close));
+      labels = data.values.reverse().map(p => p.datetime.split(" ")[1]);
     }
 
     const current = prices.at(-1);
@@ -88,6 +103,7 @@ async function generateSignal() {
     const rsi = RSI(prices, 14);
 
     let signal = "HOLD", strength = "Weak";
+
     if (ema9 > ema21 && rsi > 55) {
       signal = "BUY";
       strength = rsi > 65 ? "Strong" : "Moderate";
@@ -97,9 +113,12 @@ async function generateSignal() {
     }
 
     const colorClass = signal === "BUY" ? "buy" : signal === "SELL" ? "sell" : "hold";
-    const validity = market === "crypto"
-      ? (tf === "1m" ? "≈2-5 min" : tf === "3m" ? "≈10 min" : "≈15-30 min")
-      : "≈1-3 days";
+
+    const validity =
+      tf === "5s" ? "≈10–20s" :
+      tf === "30s" ? "≈1–2 min" :
+      tf === "1m" ? "≈2–5 min" :
+      tf === "3m" ? "≈10 min" : "≈15–30 min";
 
     out.innerHTML = `
       <p><b>Market:</b> ${market.toUpperCase()} | <b>Asset:</b> ${(market === "crypto" ? cryptoAssets[asset] : forexAssets[asset])}</p>
@@ -112,14 +131,15 @@ async function generateSignal() {
 
     const ctx = document.getElementById("priceChart");
     if (chart) chart.destroy();
+
     chart = new Chart(ctx, {
       type: "line",
       data: {
         labels: labels,
         datasets: [
-          { label: "Price", data: prices, borderColor: "#58a6ff", tension: 0.3, fill: false },
-          { label: "EMA(9)", data: EMA(prices, 9), borderColor: "#2ea043", tension: 0.3, fill: false },
-          { label: "EMA(21)", data: EMA(prices, 21), borderColor: "#f85149", tension: 0.3, fill: false }
+          { label: "Price", data: prices, borderColor: "#58a6ff", tension: .3, fill: false },
+          { label: "EMA(9)", data: EMA(prices, 9), borderColor: "#2ea043", tension: .3, fill: false },
+          { label: "EMA(21)", data: EMA(prices, 21), borderColor: "#f85149", tension: .3, fill: false }
         ]
       },
       options: {
@@ -132,13 +152,17 @@ async function generateSignal() {
     });
 
   } catch (e) {
-    out.innerHTML = `<p style="color:red;">Error: ${e.message}</p>`;
+    out.innerHTML = `<p style="color:red;">❌ Error: ${e.message}</p>`;
   }
 }
 
-// Auto-refresh every 60s
-setInterval(() => {
-  if (document.getElementById("market").value === "crypto") {
+function toggleAutoRefresh() {
+  const isChecked = document.getElementById("autoRefresh").checked;
+
+  if (isChecked) {
     generateSignal();
+    autoRefreshInterval = setInterval(generateSignal, 60000);
+  } else {
+    clearInterval(autoRefreshInterval);
   }
-}, 60000);
+}
